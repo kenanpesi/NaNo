@@ -1,0 +1,3 @@
+2024-11-26 11:28:50,678 - __main__ - ERROR - Baðlantý hatasý: [Errno 11001] getaddrinfo failed
+2024-11-26 11:42:23,856 - main - ERROR - [main.py:147] - Static directory not found: c:\Users\NaNo\Desktop\NaNo\remote_control\static
+2024-11-26 11:42:23,856 - main - INFO - [main.py:149] - Created static directory: c:\Users\NaNo\Desktop\NaNo\remote_control\static

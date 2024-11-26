@@ -1,0 +1,33 @@
+fastapi==0.103.1
+uvicorn==0.23.2
+python-multipart==0.0.6
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+websockets==11.0.3
+Jinja2==3.1.2
+aiohttp==3.8.5
+aiofiles==23.2.1
+python-dotenv==1.0.0
+pynput==1.7.6
+pyautogui==0.9.54
+Pillow==10.0.0
+cryptography==41.0.3
+prometheus-client==0.17.1
+fastapi-limiter==0.1.5
+pyOpenSSL==23.2.0
+bcrypt==4.0.1
+certifi==2023.7.22
+pyinstaller==5.13.2
+
+# Test paketleri
+pytest==7.4.2
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.0
+pytest-mock==3.11.1
+
+# Geliştirme araçları
+black==23.9.1
+flake8==6.1.0
+mypy==1.5.1
+isort==5.12.0
