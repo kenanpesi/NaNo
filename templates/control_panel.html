@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Remote Control Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .client-list {
+            width: 200px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .screen-view {
+            flex-grow: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .client-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #f8f8f8;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .client-item:hover {
+            background: #e8e8e8;
+        }
+        .client-item.active {
+            background: #007bff;
+            color: white;
+        }
+        #screen {
+            width: 100%;
+            height: calc(100vh - 100px);
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="client-list">
+            <h3>Connected Clients</h3>
+            <div id="clients"></div>
+        </div>
+        <div class="screen-view">
+            <img id="screen" />
+        </div>
+    </div>
+
+    <script>
+        let activeClient = null;
+        let controlWs = null;
+
+        function connectControl() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/control`;
+            controlWs = new WebSocket(wsUrl);
+
+            controlWs.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'client_connected') {
+                    addClient(data.client_id);
+                }
+                else if (data.type === 'client_disconnected') {
+                    removeClient(data.client_id);
+                }
+                else if (activeClient && data.client_id === activeClient) {
+                    // Ekran görüntüsünü güncelle
+                    document.getElementById('screen').src = data.screen;
+                }
+            };
+
+            controlWs.onclose = function() {
+                setTimeout(connectControl, 1000);
+            };
+        }
+
+        function addClient(clientId) {
+            const clientsDiv = document.getElementById('clients');
+            const clientDiv = document.createElement('div');
+            clientDiv.className = 'client-item';
+            clientDiv.textContent = `Client ${clientId.slice(0, 8)}`;
+            clientDiv.onclick = () => selectClient(clientId);
+            clientDiv.id = `client-${clientId}`;
+            clientsDiv.appendChild(clientDiv);
+        }
+
+        function removeClient(clientId) {
+            const clientDiv = document.getElementById(`client-${clientId}`);
+            if (clientDiv) {
+                clientDiv.remove();
+            }
+            if (activeClient === clientId) {
+                activeClient = null;
+                document.getElementById('screen').src = '';
+            }
+        }
+
+        function selectClient(clientId) {
+            activeClient = clientId;
+            
+            // Aktif client'ı vurgula
+            document.querySelectorAll('.client-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.getElementById(`client-${clientId}`).classList.add('active');
+        }
+
+        // Mouse ve klavye olaylarını dinle
+        document.getElementById('screen').addEventListener('mousemove', function(e) {
+            if (!activeClient) return;
+            
+            const rect = e.target.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            
+            controlWs.send(JSON.stringify({
+                type: 'mouse_move',
+                client_id: activeClient,
+                x: x,
+                y: y
+            }));
+        });
+
+        document.getElementById('screen').addEventListener('mousedown', function(e) {
+            if (!activeClient) return;
+            
+            controlWs.send(JSON.stringify({
+                type: 'mouse_click',
+                client_id: activeClient,
+                button: e.button
+            }));
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (!activeClient) return;
+            
+            controlWs.send(JSON.stringify({
+                type: 'key_press',
+                client_id: activeClient,
+                key: e.key
+            }));
+        });
+
+        // Bağlantıyı başlat
+        connectControl();
+    </script>
+</body>
+</html>

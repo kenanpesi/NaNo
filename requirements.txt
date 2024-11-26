@@ -1,5 +1,12 @@
-pyautogui==0.9.54
+fastapi==0.103.1
+uvicorn==0.23.2
+python-multipart==0.0.6
+python-jose==3.3.0
+passlib==1.7.4
+bcrypt==4.0.1
 websockets==11.0.3
-aiohttp==3.8.5
+Jinja2==3.1.2
+pyautogui==0.9.54
 pynput==1.7.6
+aiohttp==3.8.5
 pyinstaller==5.13.0
