@@ -69,11 +69,17 @@ class RemoteClient:
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) < 2:
-        print("Kullanım: python client.py <sunucu_adresi>")
-        print("Örnek: python client.py http://your-railway-app.railway.app")
-        sys.exit(1)
-        
-    server_url = sys.argv[1]
+    
+    # Komut satırı argümanı yoksa varsayılan olarak localhost'u kullan
+    server_url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
+    
+    print(f"Sunucuya bağlanılıyor: {server_url}")
     client = RemoteClient(server_url)
-    asyncio.get_event_loop().run_until_complete(client.connect())
+    
+    try:
+        asyncio.get_event_loop().run_until_complete(client.connect())
+    except KeyboardInterrupt:
+        print("\nProgram kapatılıyor...")
+    except Exception as e:
+        print(f"Hata: {e}")
+        input("Devam etmek için bir tuşa basın...")
